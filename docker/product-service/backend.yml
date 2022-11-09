@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  product:
+    image: n7fr846yfa6ohlhe/mbugai:product-service-0.0.1
+    environment:
+      - 'spring.config.location=/conf/application.properties'
+      - 'logging.config=file:/conf/logback.xml'
+    configs:
+      - source: product-service_logback.xml
+        target: /conf/logback.xml
+      - source: product-service_config
+        target: /conf/application.properties
+    networks:
+      default:
+        aliases:
+          - product-service-local
+    labels:
+      filebeats_log: "false"
+    ports:
+      - 48080:8080
+    deploy:
+      labels:
+        - traefik.enable=false
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 9999999
+        window: 90s
+    healthcheck:
+      test: curl --silent --fail http://localhost:8080/actuator/health || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+networks:
+  default:
+    external: true
+    name: "uae"
+
+configs:
+  product-service_logback.xml:
+    name: product-service_logback.xml-${CONFIG_VERSION:-0}
+    file: conf/logback.xml
+  product-service_config:
+    name: product-service_config-${CONFIG_VERSION:-0}
+    file: conf/application.properties

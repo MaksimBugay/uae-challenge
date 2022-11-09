@@ -1,0 +1,19 @@
+FROM openjdk:17-jdk-alpine3.14
+MAINTAINER Maksim <bmv2mail@gmail.com>
+
+# Install prerequisites
+RUN apk --no-cache add curl
+
+#use default jvm value, that can be overridden from compose file during runtime(enables passing debug args)
+ENV JVM_ARGS=-Xverify:remote
+
+ENTRYPOINT java \
+${JVM_ARGS} \
+-Djava.security.egd=file:/dev/./urandom \
+-server \
+-XX:+HeapDumpOnOutOfMemoryError \
+-XX:-OmitStackTraceInFastThrow \
+-XX:HeapDumpPath=/var/log/review/heap_dump_${APP_NAME:default}.hprof \
+-jar /app.jar
+
+EXPOSE 8080

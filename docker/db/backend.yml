@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  mysql8:
+    image: mysql/mysql-server:8.0.31
+    environment:
+      MYSQL_DATABASE: 'product_review'
+      MYSQL_ROOT_PASSWORD: 'acc_pimp'
+      MYSQL_USER: 'acc_pimp'
+      MYSQL_PASSWORD: 'acc_pimp'
+    labels:
+      - traefik.enable=false
+    volumes:
+      - 'mysql8-data-dir:/var/lib/mysql8'
+    ports:
+      - 30306:3306
+    networks:
+      - default
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+networks:
+  default:
+    external: true
+    name: "uae"
+
+volumes:
+  mysql8-data-dir:
+    driver: local
